@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas import ProductUpdate, ProductCreate
+from backend.schemas.schemas import ProductUpdate, ProductCreate
 from models.product import ProductModel
 
 
