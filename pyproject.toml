@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "projetocrud"
+version = "0.1.0"
+description = ""
+authors = ["Gustavo Miranda <gustavocataldomiranda@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.36"
+pydantic = {extras = ["email"], version = "^2.9.2"}
+fastapi = "^0.115.2"
+uvicorn = "^0.32.0"
+psycopg2 = "^2.9.10"
+psycopg2-binary = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
