@@ -6,7 +6,19 @@ st.set_page_config(layout="wide")
 st.title("Gerenciamento de produtos")
 
 def show_response_message():
-    pass
+    if response.status_code == 200:
+        st.success("Operação realizada com sucesso!")
+    else:
+        try:
+            data = response.json()
+            if 'detail' in data:
+                if isinstance(data['detail'], list):
+                    errors = "\n".join([error['msg'] for error in data['detail']])
+                    st.error(f"Erro: {errors}")
+                else:
+                    st.error(f"Erro: {data['detail']}")
+        except ValueError:
+            st.error("Erro desconhecido. Não foi possível decodificar a resposta")
 
 with st.expander("Cadastrar produto"):        
     with st.form("Novo produto"):
