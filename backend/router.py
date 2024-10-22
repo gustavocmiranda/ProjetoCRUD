@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from databases.database import SessionLocal, get_db
-from backend.schemas.schemas import ProductResponse, ProductUpdate, ProductCreate
+from schemas.schemas import ProductResponse, ProductUpdate, ProductCreate
 from typing import List
 from crud import(
     create_product,
@@ -40,8 +40,8 @@ def delete_prod(product_id: int, db: Session = Depends(get_db)):
     return product_db
 
 @router.put("/products/{product_id}", response_model=ProductResponse)
-def atualizar_product(products_id: int, product: ProductUpdate, db: Session = Depends(get_db)):
-    product_db = update_product(db, products_id, product)
+def atualizar_product(product_id: int, product: ProductUpdate, db: Session = Depends(get_db)):
+    product_db = update_product(db, product_id, product)
 
     if product_db is None:
         raise HTTPException(status_code=404, detail="Produto não existente.")

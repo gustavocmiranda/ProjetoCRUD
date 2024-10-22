@@ -5,7 +5,7 @@ import requests
 st.set_page_config(layout="wide")
 st.title("Gerenciamento de produtos")
 
-def show_response_message():
+def show_response_message(response):
     if response.status_code == 200:
         st.success("Operação realizada com sucesso!")
     else:
@@ -64,7 +64,7 @@ with st.expander("Exibir todos os produtos"):
                 "name",
                 "description",
                 "price",
-                "category"
+                "category",
                 "email_fornecedor",
                 "created_at"
             ]]
@@ -86,7 +86,7 @@ with st.expander("Obter mais detalhes de um produto"):
                 "name",
                 "description",
                 "price",
-                "category"
+                "category",
                 "email_fornecedor",
                 "created_at"
             ]]
