@@ -20,6 +20,27 @@ def show_response_message(response):
         except ValueError:
             st.error("Erro desconhecido. Não foi possível decodificar a resposta")
 
+with st.expander("Exibir todos os produtos"):
+    if st.button("Exibir todos os produtos"):
+        response = requests.get("http://backend:8000/products/")
+        if response.status_code == 200:
+            products = response.json()
+            df = pd.DataFrame(products)
+
+            df = df[[
+                "id",
+                "name",
+                "description",
+                "price",
+                "category",
+                "email_fornecedor",
+                "created_at"
+            ]]
+
+            st.write(df.to_html(index=False), unsafe_allow_html=True)
+        else:
+            show_response_message(response)
+
 with st.expander("Cadastrar produto"):        
     with st.form("Novo produto"):
         name = st.text_input("Nome do produto")
@@ -47,54 +68,50 @@ with st.expander("Cadastrar produto"):
                 }
             )
             show_response_message(response)
-
-
-            st.write("Produto cadastrado com sucesso!")
-            st.write()
-
-with st.expander("Exibir todos os produtos"):
-    if st.button("Exibir todos os produtos"):
-        response = requests.get("http://backend:8000/products/")
-        if response.status_code == 200:
-            products = response.json()
-            df = pd.DataFrame(products)
-
-            df = df[[
-                "id",
-                "name",
-                "description",
-                "price",
-                "category",
-                "email_fornecedor",
-                "created_at"
-            ]]
-
-            st.write(df.to_html(index=False), unsafe_allow_html=True)
-        else:
-            show_response_message(response)
+            if response.status_code == 200:
+                st.write("Produto cadastrado com sucesso!")
+                st.write()
 
 with st.expander("Obter mais detalhes de um produto"):
-    product_id = st.number_input("ID do produto", min_value=1, format="%d")
-    if st.button("Buscar produto"):
-        response = requests.get(f"http://backend:8000/products/{product_id}")
-        if response.status_code == 200:
-            products = response.json()
-            df = pd.DataFrame([products])
+    col1, col2 = st.columns(2, gap='medium')
+    ok = False
 
-            df = df[[
-                "id",
-                "name",
-                "description",
-                "price",
-                "category",
-                "email_fornecedor",
-                "created_at"
-            ]]
+    with col1:
+        product_id = st.number_input("ID do produto", min_value=1, format="%d")
+        if st.button("Buscar produto", key='SearchItem'):
+            response = requests.get(f"http://backend:8000/products/{product_id}")
+            if response.status_code == 200:
+                products = response.json()
+                
+                ok = True
 
-            st.write(df.to_html(index=False), unsafe_allow_html=True)
+            else:
+                show_response_message(response)
 
-        else:
-            show_response_message(response)
+    with col2:
+        if st.button("Último produto cadastrado", key='LastItem'):
+            response = requests.get("http://backend:8000/last/")
+            if response.status_code == 200:
+                products = response.json()
+                
+                ok = True
+
+            else:
+                show_response_message(response)
+
+
+    if ok:
+        df = pd.DataFrame([products])
+        df = df[[
+            "id",
+            "name",
+            "description",
+            "price",
+            "category",
+            "email_fornecedor",
+            "created_at"
+        ]]
+        st.write(df.to_html(index=False), unsafe_allow_html=True)
 
 with st.expander("Deletar produto"):
     product_id_delete = st.number_input("ID do produto", min_value=1, format="%d", key=2)
@@ -103,20 +120,36 @@ with st.expander("Deletar produto"):
         show_response_message(response)
 
 with st.expander("Atualizar produto"):
-    with st.form("Atualizar"):
-        product_id_update = st.number_input("ID do produto", min_value=1, format="%d", key=3)
+    
+    if st.button("Último produto cadastrado"):
+        response = requests.get('http://backend:8000/last/')
+        if response.status_code == 200:
+            product = response.json()
+            df = pd.DataFrame([product])
+            df = df[[
+                "id",
+                "name",
+                "description",
+                "price",
+                "category",
+                "email_fornecedor",
+                "created_at"
+            ]]
+            st.write(df.to_html(index=False), unsafe_allow_html=True)
+
+
+    with st.form("Atualizar", clear_on_submit=True):
+        product_id_update = st.number_input("ID do produto", min_value=0, format="%d", key='id')
         new_name = st.text_input("Nome do produto")
         new_category = st.selectbox("Categoria do produto",
                                 ("Roupas", "Acessórios", "Eletrodomésticos", "Utensílios de cozinha", "Petshop"),
-                                index= None,
-                                placeholder= "Escolha uma categoria...")
+                                index= None)
         new_description = st.text_area("Descrição do produto")
         new_price = st.number_input("Preço do produto",
                                 min_value=0.01,
                                 format="%.2f",
-                                placeholder="Insira um valor numérico",
                                 value=None)
-        new_email_fornecedor = st.text_input("Email do fornecedor do produto", placeholder="exemplo@exemplo.com")
+        new_email_fornecedor = st.text_input("Email do fornecedor do produto")
 
         if st.form_submit_button("Atualizar produto"):
             update_data = {}

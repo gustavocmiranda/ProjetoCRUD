@@ -8,7 +8,8 @@ from crud import(
     get_products,
     get_product,
     update_product,
-    delete_product
+    delete_product,
+    get_last_product
 )
 
 router = APIRouter()
@@ -25,6 +26,11 @@ def read_product(product_id: int, db: Session = Depends(get_db)):
     if db_product is None:
         raise HTTPException(status_code=404, detail="Produto não existe.")
     return  db_product
+
+@router.get(path='/last/', response_model=ProductResponse)
+def read_last_product(db:Session = Depends(get_db)):
+    return get_last_product(db=db)
+
 
 @router.post(path="/products/", response_model=ProductResponse)
 def post_product(product: ProductCreate, db: Session = Depends(get_db)):

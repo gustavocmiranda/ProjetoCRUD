@@ -10,6 +10,9 @@ def get_products(db: Session):
 def get_product(db: Session, product_id: int):
     return db.query(ProductModel).filter(ProductModel.id == product_id).first()
 
+def get_last_product(db:Session):
+    return db.query(ProductModel).order_by(ProductModel.id.desc()).first()
+
 def create_product(db:Session, product: ProductCreate):
     db_product = ProductModel(**product.model_dump())
     db.add(db_product)
